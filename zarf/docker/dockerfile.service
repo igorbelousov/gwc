@@ -1,0 +1,29 @@
+# Build Go binary file
+FROM golang:1.18 as build-app
+ENV CGO_ENABLED 0 
+ARG BUILD_REF
+
+
+# Copy the source code to container
+COPY . /gwc
+
+
+# Build  the service binary
+WORKDIR /gwc/app/cmd
+RUN go build -o "service" -ldflags "-X main.build=${BUILD_REF}"
+
+# Run go binary file in Alpine 
+FROM alpine:3.15.4
+ARG BUILD_DATE
+ARG BUILD_REF
+COPY --from=build-app gwc/app/cmd/ /cmd/
+WORKDIR /cmd
+CMD ["./service"]
+
+
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+    org.opencontainers.image.title="GWC-APP" \
+    org.opencontainers.image.authors="Igor Belousov <belousov.ig@gmail.com>" \
+    org.opencontainers.image.source="http://github.com/igorbelousov/gwc" \
+    org.opencontainers.image.revision="${BUILD_REF}" \
+    org.opencontainers.image.vendor="Igor Belousov" 
