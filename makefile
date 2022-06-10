@@ -38,11 +38,11 @@ kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
 kind-load:
-	
-	kind load docker-image $(SERVICE_NAME):$(VERSION) --name $(KIND_CLUSTER)
+	cd zarf/k8s/base/service-pod/; kustomize edit set image $(SERVICE_NAME)=gwc-app-amd64:$(VERSION)
+	kind load docker-image gwc-app-amd64:$(VERSION) --name $(KIND_CLUSTER)
 
 kind-apply:
-	kustomize build zarf/k8s/kind/service-pod/ | kubectl apply -f - 
+	kustomize build zarf/k8s/kind/service-pod/  | kubectl apply -f - 
 
 kind-restart:
 	kubectl rollout restart deployment service-pod
@@ -63,7 +63,7 @@ kind-status-service:
 
 
 kind-logs:
-	kubectl logs -l app=service --all-containers=true -f --tail=100
+	kubectl logs -l app=service --all-containers=true -f --tail=100 | go run app/tooling/logfmt/main.go 
 
 kind-describe:
 	# kubectl describe nodes

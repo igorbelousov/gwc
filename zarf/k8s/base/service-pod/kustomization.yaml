@@ -1,5 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./base-service.yaml
-  
+- ./base-service.yaml
+images:
+- name: gwc-app
+  newName: gwc-app-amd64
+  newTag: "1.0"
+- name: gwc-app-amd64
+  newName: gwc-app-amd64
+  newTag: "0.1"

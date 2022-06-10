@@ -22,6 +22,31 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - name: service
-        image: gwc-app-amd64:0.1
+        image: gwc-app
+        ports:
+        - name: service-api
+          containerPort: 3000
+        - name: service-debug
+          containerPort: 4000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-system
+  namespace: service-system
+spec:
+  type: ClusterIP
+  selector:
+    app: service
+  ports: 
+  - name: service-api
+    port: 3000
+    targetPort: service-api
+  - name: service-debug
+    port: 4000
+    targetPort: service-debug
+
 
 
