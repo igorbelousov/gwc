@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf"
+	"github.com/igorbelousov/gwc/foundation/handlers"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -91,9 +92,14 @@ func run(log *zap.SugaredLogger) error {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
+	apiMux := handlers.APIMux(handlers.APIMuxConfig{
+		Shutdown: shutdown,
+		Log:      log,
+	})
+
 	api := http.Server{
 		Addr:         cfg.Web.APIHost,
-		Handler:      nil,
+		Handler:      apiMux,
 		ReadTimeout:  cfg.Web.ReadTimeout,
 		WriteTimeout: cfg.Web.writeTimeout,
 		IdleTimeout:  cfg.Web.idleTimeout,
